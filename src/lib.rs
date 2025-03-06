@@ -1,7 +1,6 @@
 pub mod config;
 pub mod error;
 mod into;
-pub mod prelude;
 pub mod term;
 
 use egui::{Response, Ui, Vec2, Widget};
