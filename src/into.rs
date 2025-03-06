@@ -1,13 +1,13 @@
 // Special thanks to Speak2Erase, again; This file is almost entirely copied from her code. Go
-// check out Luminol on Github, it's a cool project :) 
+// check out Luminol on Github, it's a cool project :)
 
 use crate::error::conversion::TermConversionError;
 
-use wezterm_term::{KeyModifiers, MouseButton};
-use wezterm_term::KeyCode as WezKey;
-use wezterm_term::color::SrgbaTuple;
+use egui::Key::{self, *};
 use egui::{Color32, Modifiers, PointerButton};
-use egui::Key::{*, self};
+use wezterm_term::color::SrgbaTuple;
+use wezterm_term::KeyCode as WezKey;
+use wezterm_term::{KeyModifiers, MouseButton};
 
 pub trait IntoEgui<T> {
     fn into_egui(self) -> T;
@@ -107,10 +107,15 @@ impl IntoWez<MouseButton> for PointerButton {
 }
 
 impl IntoWez<wezterm_term::color::SrgbaTuple> for egui::Color32 {
-    fn into_wez (self) -> wezterm_term::color::SrgbaTuple {
+    fn into_wez(self) -> wezterm_term::color::SrgbaTuple {
         let (r, g, b, a) = self.to_tuple();
 
         // @todo figure out whether this is right
-        SrgbaTuple(r as f32 / 255., g as f32 / 255., b as f32 / 255., a as f32 / 255.) 
+        SrgbaTuple(
+            r as f32 / 255.,
+            g as f32 / 255.,
+            b as f32 / 255.,
+            a as f32 / 255.,
+        )
     }
 }

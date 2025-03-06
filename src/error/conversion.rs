@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter, Error};
+use std::fmt::{Display, Error, Formatter};
 
 #[derive(Debug)]
 pub struct TermConversionError;
@@ -6,10 +6,9 @@ pub struct TermConversionError;
 impl Display for TermConversionError {
     // YES IK THIS IS BAD
     // @todo fix this later
-    fn fmt (&self, _f: &mut Formatter) -> Result<(), Error> {
+    fn fmt(&self, _f: &mut Formatter) -> Result<(), Error> {
         Ok(())
     }
 }
 
-impl std::error::Error for TermConversionError { }
-
+impl std::error::Error for TermConversionError {}

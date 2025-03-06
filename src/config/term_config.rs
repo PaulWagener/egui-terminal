@@ -13,7 +13,7 @@ pub struct Style {
 }
 
 impl Style {
-    pub(crate) fn default_wez_config (&self) -> Arc<Config> {
+    pub(crate) fn default_wez_config(&self) -> Arc<Config> {
         let res = Config {
             bg: Color32::BLACK,
             fg: Color32::WHITE,
@@ -23,14 +23,14 @@ impl Style {
         Arc::new(res)
     }
 
-    pub(crate) fn generate_wez_config (&self, ui: &Ui) -> Arc<Config> {
+    pub(crate) fn generate_wez_config(&self, ui: &Ui) -> Arc<Config> {
         let fg = match self.fg_color {
             Some(c) => c,
             None => ui.style().visuals.text_color(),
         };
 
         let bg = match self.bg_color {
-            Some(c) => c, 
+            Some(c) => c,
             None => ui.style().visuals.window_fill,
         };
 
@@ -44,13 +44,10 @@ impl Style {
     }
 }
 
-
-        
-
 #[derive(Debug, Default, PartialEq)]
 pub struct Config {
-    bg: Color32, 
-    fg: Color32, 
+    bg: Color32,
+    fg: Color32,
     title_reporting: bool,
 }
 

@@ -1,2 +1,2 @@
-pub mod term_config;
 pub mod definitions;
+pub mod term_config;
