@@ -17,7 +17,7 @@ use wezterm_term::{TerminalSize, Terminal as WezTerm};
 use termwiz::cellcluster::CellCluster;
 use portable_pty::PtySize;
 
-use egui::{TextFormat, Event, Modifiers, Vec2, InputState, FontId, Response, Ui};
+use egui::{TextFormat, Event, Modifiers, Vec2, InputState, FontId, Response, Ui, Color32};
 
 use crate::into::*;
 use crate::config::definitions::TermResult;
@@ -201,8 +201,8 @@ impl TermHandler {
         Ok(())
     }
 
-    fn event_scroll (&mut self, e: &Event, modifiers: Modifiers, pointer_position: Vec2) -> TermResult {
-        let Event::Scroll(pos) = e else { unreachable!() };
+    fn event_scroll (&mut self, e: &Event, _: Modifiers, pointer_position: Vec2) -> TermResult {
+        let Event::MouseWheel{ unit: _, delta, modifiers } = e else { unreachable!() };
         let char_x = (pointer_position.x / self.text_width) as usize;
         let char_y = (pointer_position.y / self.text_height) as i64;
         self.terminal.mouse_event(wezterm_term::MouseEvent {
@@ -211,10 +211,10 @@ impl TermHandler {
             y: char_y,
             x_pixel_offset: 0,
             y_pixel_offset: 0,
-            button: if pos.y.is_sign_positive() {
-                wezterm_term::MouseButton::WheelUp(pos.y as usize)
+            button: if delta.y.is_sign_positive() {
+                wezterm_term::MouseButton::WheelUp(delta.y as usize)
             } else {
-                wezterm_term::MouseButton::WheelDown(-pos.y as usize)
+                wezterm_term::MouseButton::WheelDown(-delta.y as usize)
             },
             modifiers: modifiers.into_wez(),
         })?;
@@ -273,7 +273,7 @@ impl TermHandler {
         match event {
             Event::PointerMoved(_) => self.event_pointer_move(event, response, i.modifiers),
             Event::PointerButton {..} => self.event_pointer_button(event, response),
-            Event::Scroll(_) => self.event_scroll(event, i.modifiers, self.relative_pointer_pos(response, i)),
+            Event::MouseWheel{ ..} => self.event_scroll(event, i.modifiers, self.relative_pointer_pos(response, i)),
             Event::Key {..} => self.event_key(event),
             Event::Text(_) => self.event_text(event, i.modifiers),
             _ => Ok(()),
@@ -339,15 +339,16 @@ impl TermHandler {
             palette.background.into_egui(),
         );
 
-        painter.galley(response.rect.min, galley);
+        painter.galley(response.rect.min, galley, Color32::WHITE);
 
         painter.rect_stroke(
             egui::Rect::from_min_size(
                 cursor_pos.min,
                 egui::vec2(self.text_width, self.text_height),
             ),
-            egui::Rounding::none(),
+            egui::CornerRadius::ZERO,
             egui::Stroke::new(1.0, egui::Color32::WHITE),
+            egui::StrokeKind::Middle
         );
 
         // if ui.memory(|mem| mem.has_focus(response.id)) {
@@ -388,7 +389,7 @@ impl TermHandler {
         let r = egui::ScrollArea::vertical()
             .max_height((self.size.rows + 1) as f32 * self.text_height)
             .stick_to_bottom(true)
-            .id_source(ui.next_auto_id())
+            .id_salt(ui.next_auto_id())
             .show_rows(
                 ui,
                 self.text_height,
