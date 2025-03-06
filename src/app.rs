@@ -16,7 +16,7 @@ impl App {
         args.next();
         let cmd = match args.next() {
             Some(c) => c,
-            None => String::from("bash"),
+            None => String::from("/bin/zsh"),
         };
 
         map.insert(String::from("root"), TermHandler::new_from_str(&cmd));
