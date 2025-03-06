@@ -8,12 +8,12 @@ use std::ffi::OsString;
 use std::io::prelude::*;
 use std::ops::Range;
 use std::sync::Arc;
+use std::sync::mpsc::{Receiver, channel};
 
 pub use portable_pty::CommandBuilder;
 pub use termwiz::Error;
 
-use crossbeam_channel::{unbounded, Receiver};
-use portable_pty::PtySize;
+use portable_pty::{ExitStatus, PtySize};
 use termwiz::cellcluster::CellCluster;
 use wezterm_term::{Terminal as WezTerm, TerminalSize};
 
@@ -80,7 +80,7 @@ impl TermHandler {
             writer,
         );
 
-        let (sender, reciever) = unbounded();
+        let (sender, receiver) = channel();
         std::thread::spawn(move || {
             let mut buf = [0; 2usize.pow(10)];
             let mut reader = std::io::BufReader::new(reader);
@@ -99,7 +99,7 @@ impl TermHandler {
             terminal,
             style,
             wez_config,
-            reader: reciever,
+            reader: receiver,
             child,
             pair,
             text_width: 0.0,
@@ -386,7 +386,7 @@ impl TermHandler {
         response
     }
 
-    pub(crate) fn draw(
+    pub fn draw(
         &mut self,
         ui: &mut egui::Ui,
         widget_size: egui::Vec2,
@@ -425,10 +425,14 @@ impl TermHandler {
     }
 
     #[inline(never)]
-    fn kill(&mut self) {
+    pub fn kill(&mut self) {
         if let Err(e) = self.child.kill() {
             eprintln!("error killing child: {e}");
         }
+    }
+
+    pub fn exit_status(&mut self) -> Option<ExitStatus> {
+        self.child.try_wait().ok().flatten()
     }
 
     fn resize_rc(&mut self) {
