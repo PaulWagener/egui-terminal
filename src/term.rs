@@ -386,11 +386,7 @@ impl TermHandler {
         response
     }
 
-    pub fn draw(
-        &mut self,
-        ui: &mut egui::Ui,
-        widget_size: egui::Vec2,
-    ) -> std::io::Result<Response> {
+    pub fn draw(&mut self, ui: &mut egui::Ui, widget_size: egui::Vec2) -> Response {
         while let Ok(actions) = self.reader.try_recv() {
             self.terminal.perform_actions(actions);
         }
@@ -421,7 +417,7 @@ impl TermHandler {
         ui.ctx()
             .request_repaint_after(std::time::Duration::from_millis(16));
 
-        Ok(r)
+        r
     }
 
     #[inline(never)]

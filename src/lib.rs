@@ -21,9 +21,7 @@ impl Widget for Terminal<'_> {
             Some(s) => s,
             None => ui.available_size(),
         };
-        self.terminal
-            .draw(ui, size)
-            .expect("terminal should not error")
+        self.terminal.draw(ui, size)
     }
 }
 
