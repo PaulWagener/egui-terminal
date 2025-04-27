@@ -90,6 +90,9 @@ impl TermHandler {
                 let Ok(len) = reader.read(&mut buf) else {
                     return;
                 };
+                if len == 0 {
+                    return;
+                }
                 let actions = parser.parse_as_vec(&buf[0..len]);
                 let Ok(_) = sender.send(actions) else { return };
             }
